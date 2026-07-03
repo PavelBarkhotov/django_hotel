@@ -1,0 +1,9 @@
+### Создание категории (комментарий-название)
+POST http://127.0.0.1:8000/bookings/create
+Content-Type: application/json
+
+{
+  "room_id": 24,
+  "date_start": "2021-12-30",
+  "date_end": "2022-01-02"
+}
