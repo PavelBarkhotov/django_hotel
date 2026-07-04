@@ -8,6 +8,8 @@ dependencies = [
     "bandit>=1.9.4",
     "django==6.0.6",
     "django-environ>=0.14.0",
+    "django-filter>=25.2",
+    "djangorestframework>=3.17.1",
     "mypy>=2.1.0",
     "psycopg2-binary>=2.9.12",
     "radon>=6.0.1",
@@ -44,5 +46,10 @@ warn_unused_configs = true
 check_untyped_defs = true
 disallow_incomplete_defs = true
 no_implicit_optional = true
+
+[dependency-groups]
+dev = [
+    "djangorestframework-stubs>=3.17.0",
+]
 
 

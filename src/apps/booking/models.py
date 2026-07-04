@@ -14,7 +14,8 @@ class Room(models.Model):
 class Booking(models.Model):
     class Meta:
         db_table = "bookings"
+        ordering = ["date_start"]
 
-    room_id = models.ForeignKey(to=Room, verbose_name="ИД команты", on_delete=models.PROTECT)
-    start_at = models.DateField(verbose_name="Дата начала брони")
-    end_at = models.DateField(verbose_name="Дата окончания брони")
+    room = models.ForeignKey(to=Room, verbose_name="ИД команты", on_delete=models.PROTECT)
+    date_start = models.DateField(verbose_name="Дата начала брони")
+    date_end = models.DateField(verbose_name="Дата окончания брони")
