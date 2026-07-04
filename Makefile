@@ -30,10 +30,10 @@ help:
 # Ruff: линт и форматирование
 # ===============================
 lint:
-	poetry run ruff check $(PY_SRCS) --fix
+	uv run ruff check $(PY_SRCS) --fix
 
 fmt:
-	poetry run ruff format $(PY_SRCS)
+	uv run ruff format $(PY_SRCS)
 
 # ===============================
 # Mypy: проверка типов
@@ -41,7 +41,7 @@ fmt:
 # ===============================
 
 type:
-	poetry run mypy $(PY_SRCS)
+	uv run mypy $(PY_SRCS)
 
 # ===============================
 # Bandit: анализ безопасности
@@ -49,16 +49,16 @@ type:
 security:
 # -r: рекурсивно, -lll: максимум строгости вывода,
 # -x: исключения (подправьте под проект)
-	poetry run bandit -r src -lll -x .venv,venv,build,dist,migrations
+	uv run bandit -r $(PY_SRCS) -lll -x .venv,venv,build,dist,migrations
 
 # ===============================
 # Radon: метрики
 # ===============================
 # Цикломатическая сложность: подробный вывод (-s), среднее (-a)
 cc:
-	poetry run radon cc -s -a $(PY_SRCS)
+	uv run radon cc -s -a $(PY_SRCS)
 	@# QUALITY GATE: проваливаем, если есть элементы со сложностью E/F
-	@if poetry run radon cc -s $(PY_SRCS) | grep -E ' [EF] '; then \
+	@if uv run radon cc -s $(PY_SRCS) | grep -E ' [EF] '; then \
 		echo "❌ Radon CC: обнаружены функции со сложностью E/F"; \
 		exit 1; \
 	else \
@@ -67,9 +67,9 @@ cc:
 
 # Индекс поддерживаемости
 mi:
-	@poetry run radon mi $(PY_SRCS)
+	@uv run radon mi $(PY_SRCS)
 	@# QUALITY GATE: проваливаем, если есть MI < $(RADON_MIN_MI)
-	@MI_BAD=$$(radon mi $(PY_SRCS) | awk '{print $$NF}' | awk -F: '{print $$NF}' | awk '$$1+0<$(RADON_MIN_MI){print}'); \
+	@MI_BAD=$$(uv run radon mi $(PY_SRCS) | awk '{print $$NF}' | awk -F: '{print $$NF}' | awk '$$1+0<$(RADON_MIN_MI){print}'); \
 	if [ -n "$$MI_BAD" ]; then \
 		echo "❌ Radon MI: найден MI < $(RADON_MIN_MI)"; \
 		exit 1; \
@@ -78,10 +78,10 @@ mi:
 	fi
 # Метрика халстеда
 hal:
-	poetry run radon hal $(PY_SRCS)
+	uv run radon hal $(PY_SRCS)
 # Метрика Raw
 raw:
-	poetry run radon raw $(PY_SRCS)
+	uv run radon raw $(PY_SRCS)
 
 # ===============================
 # Комплексные цели
