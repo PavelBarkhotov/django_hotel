@@ -18,7 +18,12 @@ Content-Type: application/json
 
 ### Удаление брони
 # Ожидаемый ответ сервера: 204 No Content
-DELETE http://127.0.0.1:8000/bookings/1/delete/
+DELETE http://127.0.0.1:8000/bookings/7/delete/
+Accept: application/json
+
+### Удаление комнаты
+# Ожидаемый ответ сервера: 204 No Content
+DELETE http://127.0.0.1:8000/rooms/2/delete/
 Accept: application/json
 
 
