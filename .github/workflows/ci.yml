@@ -29,4 +29,6 @@ jobs:
       - name: Run quality gate checks
         env:
           PYTHONPATH: src
+          SECRET_KEY: "dummy-key-for-ci"
+          DATABASE_URL: "dummy-url-for-ci"
         run: make check
