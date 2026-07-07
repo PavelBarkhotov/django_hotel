@@ -161,6 +161,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "django-stubs" },
     { name = "djangorestframework-stubs" },
 ]
 
@@ -179,7 +180,10 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
-dev = [{ name = "djangorestframework-stubs", specifier = ">=3.17.0" }]
+dev = [
+    { name = "django-stubs", specifier = ">=6.0.6" },
+    { name = "djangorestframework-stubs", specifier = ">=3.17.0" },
+]
 
 [[package]]
 name = "djangorestframework"

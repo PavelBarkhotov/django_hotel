@@ -58,7 +58,7 @@ security:
 cc:
 	uv run radon cc -s -a $(PY_SRCS)
 	@# QUALITY GATE: проваливаем, если есть элементы со сложностью E/F
-	@if uv run radon cc -s $(PY_SRCS) | grep -E ' [EF] '; then \
+	@if uv run radon cc -s $(PY_SRCS) | grep -E ' [EF] \('; then \
 		echo "❌ Radon CC: обнаружены функции со сложностью E/F"; \
 		exit 1; \
 	else \
@@ -67,9 +67,9 @@ cc:
 
 # Индекс поддерживаемости
 mi:
-	@uv run radon mi $(PY_SRCS)
+	@uv run radon mi -s $(PY_SRCS)
 	@# QUALITY GATE: проваливаем, если есть MI < $(RADON_MIN_MI)
-	@MI_BAD=$$(uv run radon mi $(PY_SRCS) | awk '{print $$NF}' | awk -F: '{print $$NF}' | awk '$$1+0<$(RADON_MIN_MI){print}'); \
+	@MI_BAD=$$(uv run radon mi -s $(PY_SRCS) | awk '{print $$NF}' | awk -F: '{print $$NF}' | tr -d '()' | awk '$$1+0<$(RADON_MIN_MI){print}'); \
 	if [ -n "$$MI_BAD" ]; then \
 		echo "❌ Radon MI: найден MI < $(RADON_MIN_MI)"; \
 		exit 1; \

@@ -40,15 +40,21 @@ line-ending = "lf"
 docstring-code-format = true
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.13"
+mypy_path = "src"
 ignore_missing_imports = true
 warn_unused_configs = true
 check_untyped_defs = true
 disallow_incomplete_defs = true
 no_implicit_optional = true
+plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
+
+[tool.django-stubs]
+django_settings_module = "config.settings"
 
 [dependency-groups]
 dev = [
+    "django-stubs>=6.0.6",
     "djangorestframework-stubs>=3.17.0",
 ]
 

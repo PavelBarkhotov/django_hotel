@@ -3,10 +3,10 @@ from typing import Any
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
+from rest_framework.exceptions import NotFound
 from rest_framework.generics import (
     CreateAPIView,
     DestroyAPIView,
-    GenericAPIView,
     ListAPIView,
     RetrieveAPIView,
 )
@@ -27,13 +27,16 @@ def index(request):
 
 
 class CreateReturnIdAPIMixin(CreateAPIView):
-    def create(self: GenericAPIView, request: Request, *args: Any, **kwargs: Any) -> Response:
+    def create(self: CreateAPIView, request: Request, *args: Any, **kwargs: Any) -> Response:
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         self.perform_create(serializer)
 
-        return Response({"id": serializer.instance.id}, status=status.HTTP_201_CREATED)
+        if serializer.instance:
+            return Response({"id": serializer.instance.id}, status=status.HTTP_201_CREATED)
+        else:
+            raise NotFound("Объект не найден")
 
 
 class BookingCreateReturnIdAPIView(CreateReturnIdAPIMixin, CreateAPIView):
