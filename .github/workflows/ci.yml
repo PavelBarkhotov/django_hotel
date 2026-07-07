@@ -27,4 +27,6 @@ jobs:
         run: uv sync --frozen
 
       - name: Run quality gate checks
+        env:
+          PYTHONPATH: src
         run: make check
