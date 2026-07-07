@@ -7,8 +7,9 @@ from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import (
     CreateAPIView,
-    DestroyAPIView,
     ListAPIView,
+    UpdateAPIView,
+    DestroyAPIView,
     RetrieveAPIView,
 )
 from rest_framework.request import Request
@@ -58,6 +59,11 @@ class BookingRetrieveAPIView(RetrieveAPIView):
     serializer_class = BookingReadSerializer
 
 
+class BookingUpdateAPIView(CreateReturnIdAPIMixin, UpdateAPIView):
+    queryset = Booking.objects.all()
+    serializer_class = BookingReadSerializer
+
+
 class BookingDestroyAPIView(DestroyAPIView):
     queryset = Booking.objects.all()
 
@@ -77,6 +83,11 @@ class RoomListAPIView(ListAPIView):
 
 
 class RoomRetrieveAPIView(RetrieveAPIView):
+    queryset = Room.objects.all()
+    serializer_class = RoomReadSerializer
+
+
+class RoomUpdateAPIView(CreateReturnIdAPIMixin, UpdateAPIView):
     queryset = Room.objects.all()
     serializer_class = RoomReadSerializer
 

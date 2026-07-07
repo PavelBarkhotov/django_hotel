@@ -35,11 +35,22 @@ Accept: application/json
 ### Полное обновление брони (PUT)
 # Обязательно передаются все требуемые поля
 # Ожидаемый ответ сервера: 200 OK
-PUT http://127.0.0.1:8000/bookings/1/update/
+PUT http://127.0.0.1:8000/bookings/8/update/
 Content-Type: application/json
 
 {
-  "date_start": "2026-07-10",
-  "date_end": "2026-07-20",
-  "room_id": 3
+  "room_id": 3,
+  "date_start": "2022-01-31",
+  "date_end": "2022-02-14"
+}
+
+### Полное обновление комнаты (PUT)
+# Обязательно передаются все требуемые поля
+# Ожидаемый ответ сервера: 200 OK
+PUT http://127.0.0.1:8000/rooms/1/update/
+Content-Type: application/json
+
+{
+  "description": "description first room",
+  "price": 1234
 }
