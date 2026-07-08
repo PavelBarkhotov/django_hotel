@@ -2,15 +2,15 @@ from typing import Any
 
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import OrderingFilter
 from rest_framework import status
 from rest_framework.exceptions import NotFound
+from rest_framework.filters import OrderingFilter
 from rest_framework.generics import (
     CreateAPIView,
-    ListAPIView,
-    UpdateAPIView,
     DestroyAPIView,
+    ListAPIView,
     RetrieveAPIView,
+    UpdateAPIView,
 )
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -78,8 +78,8 @@ class RoomListAPIView(ListAPIView):
     serializer_class = RoomReadSerializer
 
     filter_backends = [OrderingFilter]
-    ordering_fields = ['price', 'created_at']
-    ordering = ['created_at']
+    ordering_fields = ["price", "created_at"]
+    ordering = ["created_at"]
 
 
 class RoomRetrieveAPIView(RetrieveAPIView):

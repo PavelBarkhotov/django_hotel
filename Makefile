@@ -67,9 +67,9 @@ cc:
 
 # Индекс поддерживаемости
 mi:
-	@uv run radon mi -s $(PY_SRCS)
+	@uv run radon mi -s -e '*/tests/*' $(PY_SRCS)
 	@# QUALITY GATE: проваливаем, если есть MI < $(RADON_MIN_MI)
-	@MI_BAD=$$(uv run radon mi -s $(PY_SRCS) | awk '{print $$NF}' | awk -F: '{print $$NF}' | tr -d '()' | awk '$$1+0<$(RADON_MIN_MI){print}'); \
+	@MI_BAD=$$(uv run radon mi -s -e '*/tests/*' $(PY_SRCS) | awk '{print $$NF}' | awk -F: '{print $$NF}' | tr -d '()' | awk '$$1+0<$(RADON_MIN_MI){print}'); \
 	if [ -n "$$MI_BAD" ]; then \
 		echo "❌ Radon MI: найден MI < $(RADON_MIN_MI)"; \
 		exit 1; \

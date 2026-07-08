@@ -52,10 +52,17 @@ plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
 [tool.django-stubs]
 django_settings_module = "config.settings"
 
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+pythonpath = [".", "src"]
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+
 [dependency-groups]
 dev = [
     "django-stubs>=6.0.6",
     "djangorestframework-stubs>=3.17.0",
+    "pytest>=9.1.1",
+    "pytest-django>=4.12.0",
 ]
 
 
