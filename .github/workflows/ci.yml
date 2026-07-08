@@ -26,9 +26,10 @@ jobs:
       - name: Install dependencies
         run: uv sync --frozen
 
+      - name: Set up .env file
+        run: cp .env-example .env
+
       - name: Run quality gate checks
         env:
           PYTHONPATH: src
-          SECRET_KEY: "dummy-key-for-ci"
-          DATABASE_URL: "dummy-url-for-ci"
         run: make check
