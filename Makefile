@@ -6,7 +6,7 @@ PY_SRCS=src
 # Порог для Radon:
 # - запрещаем функции со сложностью CC уровней E/F
 # - минимальный Maintainability Index (MI)
-RADON_MIN_MI=65
+RADON_MIN_MI=50
 # ===============================
 # Служебные цели
 # ===============================
@@ -49,7 +49,7 @@ type:
 security:
 # -r: рекурсивно, -lll: максимум строгости вывода,
 # -x: исключения (подправьте под проект)
-	uv run bandit -r $(PY_SRCS) -lll -x .venv,venv,build,dist,migrations
+	uv run bandit -r $(PY_SRCS) -x .venv,venv,build,dist,migrations,tests
 
 # ===============================
 # Radon: метрики

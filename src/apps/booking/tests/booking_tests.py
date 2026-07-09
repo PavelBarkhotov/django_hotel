@@ -24,7 +24,7 @@ def sample_booking():
 def test_create_booking(api_client, sample_booking):
     room, booking = sample_booking
     url = reverse("api_booking_create")
-    data = {"room_id": room.id, "date_start": "2025-01-01", "date_end": "2025-02-01"}
+    data = {"room_id": room.id, "date_start": "2025-03-01", "date_end": "2025-04-01"}
 
     response = api_client.post(url, data, format="json")
     print(response.data)
