@@ -1,18 +1,10 @@
-from typing import Any
-
-from django.http import HttpResponse
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import status
-from rest_framework.exceptions import NotFound
+from drf_spectacular.utils import extend_schema
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.filters import OrderingFilter
-from rest_framework.generics import (
-    CreateAPIView,
-    DestroyAPIView,
-    ListAPIView,
-    RetrieveAPIView,
-    UpdateAPIView,
-)
-from rest_framework.request import Request
 from rest_framework.response import Response
 
 from .models import Booking, Room
@@ -22,75 +14,87 @@ from .serializers import (
     RoomReadSerializer,
     RoomWriteSerializer,
 )
+from .services import create_booking, update_booking
 
 
-def index(request):
-    return HttpResponse("<h1>Index page</h1>")
+class RoomViewSet(viewsets.ModelViewSet):
+    """
+    CRUD для управления комнатами.
+    """
 
-
-class CreateReturnIdAPIMixin(CreateAPIView):
-    def create(self: CreateAPIView, request: Request, *args: Any, **kwargs: Any) -> Response:
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        self.perform_create(serializer)
-
-        if serializer.instance:
-            return Response({"id": serializer.instance.id}, status=status.HTTP_201_CREATED)
-        else:
-            raise NotFound("Объект не найден")
-
-
-class BookingCreateReturnIdAPIView(CreateReturnIdAPIMixin, CreateAPIView):
-    queryset = Booking.objects.all()
-    serializer_class = BookingWriteSerializer
-
-
-class BookingListAPIView(ListAPIView):
-    queryset = Booking.objects.all()
-    serializer_class = BookingReadSerializer
-
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["room"]
-
-
-class BookingRetrieveAPIView(RetrieveAPIView):
-    queryset = Booking.objects.all()
-    serializer_class = BookingReadSerializer
-
-
-class BookingUpdateAPIView(CreateReturnIdAPIMixin, UpdateAPIView):
-    queryset = Booking.objects.all()
-    serializer_class = BookingReadSerializer
-
-
-class BookingDestroyAPIView(DestroyAPIView):
-    queryset = Booking.objects.all()
-
-
-class RoomCreateReturnIdAPIView(CreateReturnIdAPIMixin, CreateAPIView):
     queryset = Room.objects.all()
-    serializer_class = RoomWriteSerializer
-
-
-class RoomListAPIView(ListAPIView):
-    queryset = Room.objects.all()
-    serializer_class = RoomReadSerializer
-
     filter_backends = [OrderingFilter]
     ordering_fields = ["price", "created_at"]
     ordering = ["created_at"]
 
+    def get_serializer_class(self):
+        if self.action in ["create", "update", "partial_update"]:
+            return RoomWriteSerializer
+        return RoomReadSerializer
 
-class RoomRetrieveAPIView(RetrieveAPIView):
-    queryset = Room.objects.all()
-    serializer_class = RoomReadSerializer
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        if serializer.instance is None:
+            raise RuntimeError("Объект не был создан")
+
+        return Response({"id": serializer.instance.id}, status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        if serializer.instance is None:
+            raise RuntimeError("Объект не был обновлен")
+
+        return Response({"id": serializer.instance.id}, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        summary="Получить список бронирований по комнате",
+        responses=BookingReadSerializer(many=True),
+    )
+    @action(detail=True, methods=["get"])
+    def bookings(self, request, pk=None):
+        room = self.get_object()
+        bookings = room.booking_set.all()
+
+        serializer = BookingReadSerializer(bookings, many=True)
+        return Response(serializer.data)
 
 
-class RoomUpdateAPIView(CreateReturnIdAPIMixin, UpdateAPIView):
-    queryset = Room.objects.all()
-    serializer_class = RoomReadSerializer
+class BookingViewSet(viewsets.ModelViewSet):
+    """
+    CRUD для управления бронированиями.
+    """
 
+    queryset = Booking.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["room"]
 
-class RoomDestroyAPIView(DestroyAPIView):
-    queryset = Room.objects.all()
+    def get_serializer_class(self):
+        if self.action in ["create", "update", "partial_update"]:
+            return BookingWriteSerializer
+        return BookingReadSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            booking = create_booking(**serializer.validated_data)
+            return Response({"id": booking.id}, status=status.HTTP_201_CREATED)
+        except DjangoValidationError as e:
+            raise DRFValidationError(e.message_dict if hasattr(e, "error_dict") else str(e)) from e
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        try:
+            booking = update_booking(booking=instance, **serializer.validated_data)
+            return Response({"id": booking.id}, status=status.HTTP_200_OK)
+        except DjangoValidationError as e:
+            raise DRFValidationError(e.message_dict if hasattr(e, "error_dict") else str(e)) from e
