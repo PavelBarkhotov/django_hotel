@@ -11,7 +11,7 @@ RADON_MIN_MI=50
 # Служебные цели
 # ===============================
 
-.PHONY: help install lint fmt type security cc mi hal raw check
+.PHONY: help install lint fmt type security cc mi hal raw test check
 
 help:
 	@echo "Доступные цели:"
@@ -31,6 +31,9 @@ help:
 # ===============================
 lint:
 	uv run ruff check $(PY_SRCS) --fix
+
+test:
+	uv run pytest
 
 fmt:
 	uv run ruff format $(PY_SRCS)
@@ -87,4 +90,4 @@ raw:
 # Комплексные цели
 # ===============================
 # Локальный быстрый прогон с автофиксом Ruff
-check: lint fmt type security cc mi hal raw
+check: lint test fmt type security cc mi hal raw

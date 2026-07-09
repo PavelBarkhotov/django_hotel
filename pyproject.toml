@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "apiclient>=1.0.4",
     "bandit>=1.9.4",
     "django==6.0.6",
     "django-environ>=0.14.0",
@@ -56,7 +57,7 @@ django_settings_module = "config.settings"
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings"
 pythonpath = [".", "src"]
-python_files = ["tests.py", "test_*.py", "*_tests.py"]
+python_files = ["tests.py", "test_*.py", "*_tests.py", "conftest.py"]
 
 [dependency-groups]
 dev = [
