@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import logging
 from pathlib import Path
 
 import environ
@@ -129,4 +130,84 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "API для управления бронированием номеров в отеле.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+}
+
+
+class ConsoleFormatter(logging.Formatter):
+    """Formatter для вывода логов в консоль при DEBUG=True"""
+
+    def format(self, record: logging.LogRecord) -> str:
+        msg = super().format(record)
+
+        standard_attrs = {
+            "name",
+            "msg",
+            "args",
+            "levelname",
+            "levelno",
+            "pathname",
+            "filename",
+            "module",
+            "exc_info",
+            "exc_text",
+            "stack_info",
+            "lineno",
+            "funcName",
+            "created",
+            "msecs",
+            "relativeCreated",
+            "thread",
+            "threadName",
+            "processName",
+            "process",
+            "message",
+            "asctime",
+            "taskName",
+        }
+
+        extras = {k: v for k, v in record.__dict__.items() if k not in standard_attrs}
+
+        if extras:
+            extra_str = " ".join(f"{k}: {v}," for k, v in extras.items())
+            msg = f"{msg} | {extra_str}"
+
+        return msg
+
+
+CONSOLE_FORMATTER = "console_custom" if env("DEBUG") else "json"
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "console_custom": {
+            "()": ConsoleFormatter,
+            "format": "{asctime} [{levelname}] {name} - {message}",
+            "style": "{",
+            "datefmt": "%H:%M:%S",
+        },
+        "json": {
+            "()": "pythonjsonlogger.json.JsonFormatter",
+            "format": "%(asctime)s %(levelname)s %(name)s %(module)s %(message)s",
+        },
+    },
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": CONSOLE_FORMATTER,
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": True,
+        },
+        "apps.booking": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
 }
