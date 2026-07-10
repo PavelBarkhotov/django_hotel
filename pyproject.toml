@@ -12,6 +12,7 @@ dependencies = [
     "django-filter>=25.2",
     "djangorestframework>=3.17.1",
     "drf-spectacular>=0.30.0",
+    "gunicorn>=26.0.0",
     "mypy>=2.1.0",
     "psycopg2-binary>=2.9.12",
     "python-json-logger>=4.1.0",
