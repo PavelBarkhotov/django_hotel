@@ -10,8 +10,6 @@ wheels/
 .venv
 .env
 .idea
-logs/
-*.log
 
 #db
 *.sqlite3
