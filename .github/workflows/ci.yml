@@ -1,0 +1,50 @@
+name: Dev CI Pipeline
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: dummy_user
+          POSTGRES_PASSWORD: dummy_pass
+          POSTGRES_DB: dummy_db
+        ports:
+          - 5432:5432
+
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Set up .env file
+        run: cp .env-example .env
+
+      - name: Run quality gate checks
+        env:
+          PYTHONPATH: src
+        run: make check
